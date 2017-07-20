@@ -63,6 +63,9 @@ public final class PDFViewController: UIViewController {
         /// Performs a custom action
         case customAction((Void) -> ())
     }
+
+    /// Container view showing the current page count when navigating
+    @IBOutlet public var pageCounterContainer: UIView!
     
     /// Collection veiw where all the pdf pages are rendered
     @IBOutlet public var collectionView: UICollectionView!
@@ -77,7 +80,11 @@ public final class PDFViewController: UIViewController {
     @IBOutlet private var thumbnailCollectionControllerWidth: NSLayoutConstraint!
     
     /// PDF document that should be displayed
-    fileprivate var document: PDFDocument!
+    fileprivate var document: PDFDocument! {
+        didSet {
+            setPageCounter()
+        }
+    }
     
     fileprivate var actionStyle = ActionStyle.print
     
@@ -85,8 +92,15 @@ public final class PDFViewController: UIViewController {
     fileprivate var actionButtonImage: UIImage?
     
     /// Current page being displayed
-    fileprivate var currentPageIndex: Int = 0
-    
+    fileprivate var currentPageIndex: Int = 0 {
+        didSet {
+            setPageCounter()
+        }
+    }
+
+    /// Page Number controller
+    fileprivate var pageNumberController: PDFPageNumberViewController?
+
     /// Bottom thumbnail controller
     fileprivate var thumbnailCollectionController: PDFThumbnailCollectionViewController?
     
@@ -137,7 +151,7 @@ public final class PDFViewController: UIViewController {
         if let backItem = backButton {
             navigationItem.leftBarButtonItem = backItem
         }
-        
+
         let numberOfPages = CGFloat(document.pageCount)
         let cellSpacing = CGFloat(2.0)
         let totalSpacing = (numberOfPages - 1.0) * cellSpacing
@@ -162,13 +176,16 @@ public final class PDFViewController: UIViewController {
     public override func shouldPerformSegue(withIdentifier identifier: String, sender: Any?) -> Bool {
         return isThumbnailsEnabled
     }
-    
+
     override public func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if let controller = segue.destination as? PDFThumbnailCollectionViewController {
             thumbnailCollectionController = controller
             controller.document = document
             controller.delegate = self
             controller.currentPageIndex = currentPageIndex
+        } else if let controller = segue.destination as? PDFPageNumberViewController {
+            pageNumberController = controller
+            setPageCounter()
         }
     }
     
@@ -219,6 +236,10 @@ public final class PDFViewController: UIViewController {
         printInteraction.showsPageRange = true
         printInteraction.present(animated: true, completionHandler: nil)
     }
+
+    private func setPageCounter() {
+        pageNumberController?.pageCount = PageCount(currentPage: currentPageIndex + 1, pageCount: document.pageCount)
+    }
 }
 
 extension PDFViewController: PDFThumbnailControllerDelegate {
@@ -246,19 +267,25 @@ extension PDFViewController: PDFPageCollectionViewCellDelegate {
     /// - parameter shouldHide: whether or not the controller should hide the thumbnail controller
     private func hideThumbnailController(_ shouldHide: Bool) {
         self.thumbnailCollectionControllerBottom.constant = shouldHide ? -thumbnailCollectionControllerHeight.constant : 0
+        pageCounterContainer.alpha = shouldHide ? 0 : 1
     }
     
     func handleSingleTap(_ cell: PDFPageCollectionViewCell, pdfPageView: PDFPageView) {
-        var shouldHide: Bool {
+        let shouldHide: Bool = {
             guard let isNavigationBarHidden = navigationController?.isNavigationBarHidden else {
                 return false
             }
             return !isNavigationBarHidden
-        }
-        UIView.animate(withDuration: 0.25) {
+        }()
+        pageCounterContainer.isHidden = false
+        pageCounterContainer.alpha = shouldHide ? 1 : 0
+        view.layoutIfNeeded()
+        UIView.animate(withDuration: 0.25, animations: {
             self.hideThumbnailController(shouldHide)
             self.navigationController?.setNavigationBarHidden(shouldHide, animated: true)
-        }
+        }, completion: { _ in
+            self.pageCounterContainer.isHidden = shouldHide
+        })
     }
 }
 

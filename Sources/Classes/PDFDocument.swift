@@ -8,6 +8,8 @@
 
 import CoreGraphics
 import UIKit
+import RxSwift
+import RxCocoa
 
 /// PDF Document on the system to be interacted with
 public struct PDFDocument {
@@ -104,20 +106,18 @@ public struct PDFDocument {
     }
     
     /// Image representations of all the document pages
-    func allPageImages(callback: ([UIImage]) -> Void) {
-        var images = [UIImage]()
-        var pagesCompleted = 0
-        for pageNumber in 0..<pageCount {
-            pdfPageImage(at: pageNumber+1, callback: { (image) in
-                if let image = image {
-                    images.append(image)
+    func allPageImages() -> [Observable<UIImage?>] {
+        return (0..<pageCount).map({ pageNumber in
+            Observable.create({observer in
+                DispatchQueue.global(qos: .background).async {
+                    self.pdfPageImage(at: pageNumber + 1) { image in
+                        observer.on(.next(image))
+                        observer.on(.completed)
+                    }
                 }
-                pagesCompleted += 1
-                if pagesCompleted == pageCount {
-                    callback(images)
-                }
-            })
-        }
+                return Disposables.create()
+            }).observeOn(MainScheduler.instance).shareReplay(1)
+        })
     }
     
     /// Image representation of the document page, first looking at the cache, calculates otherwise
@@ -135,7 +135,7 @@ public struct PDFDocument {
                     callback(nil)
                     return
                 }
-                
+
                 images.setObject(image, forKey: NSNumber(value: pageNumber))
                 callback(image)
             })
@@ -153,7 +153,6 @@ public struct PDFDocument {
             callback(nil)
             return
         }
-        
         let originalPageRect = page.originalPageRect
         
         let scalingConstant: CGFloat = 240

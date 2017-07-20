@@ -7,6 +7,8 @@
 //
 
 import UIKit
+import RxSwift
+import RxCocoa
 
 /// Delegate that is informed of important interaction events with the current thumbnail collection view
 protocol PDFThumbnailControllerDelegate: class {
@@ -37,7 +39,7 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
     weak var delegate: PDFThumbnailControllerDelegate?
     
     /// Small thumbnail image representations of the pdf pages
-    private var pageImages: [UIImage]? {
+    private var pageImages: [Observable<UIImage?>]? {
         didSet {
             collectionView?.reloadData()
         }
@@ -46,11 +48,7 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
     override func viewDidLoad() {
         super.viewDidLoad()
         DispatchQueue.global(qos: .background).async {
-            self.document.allPageImages(callback: { (images) in
-                DispatchQueue.main.async {
-                    self.pageImages = images
-                }
-            })
+            self.pageImages = self.document.allPageImages()
         }
     }
 
@@ -61,7 +59,7 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! PDFThumbnailCell
         
-        cell.imageView?.image = pageImages?[indexPath.row]
+        cell.image = pageImages?[indexPath.row]
         cell.alpha = currentPageIndex == indexPath.row ? 1 : 0.2
         
         return cell
