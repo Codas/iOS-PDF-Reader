@@ -56,17 +56,17 @@
                                 </constraints>
                             </view>
                             <view opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" translatesAutoresizingMaskIntoConstraints="NO" id="RP6-Iv-TwA" userLabel="PageCount View">
-                                <rect key="frame" x="118" y="589.5" width="140" height="25.5"/>
+                                <rect key="frame" x="118" y="588" width="140" height="27"/>
                                 <subviews>
                                     <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="mbx-zj-3nS">
-                                        <rect key="frame" x="0.0" y="0.0" width="140" height="25.5"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="140" height="27"/>
                                         <connections>
                                             <segue destination="Wsl-SD-zul" kind="embed" id="DFZ-9f-iZJ"/>
                                         </connections>
                                     </containerView>
                                 </subviews>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="25.5" id="2qQ-Sb-fKo"/>
+                                    <constraint firstAttribute="height" constant="27" id="2qQ-Sb-fKo"/>
                                     <constraint firstItem="mbx-zj-3nS" firstAttribute="top" secondItem="RP6-Iv-TwA" secondAttribute="top" id="5WI-tC-ydk"/>
                                     <constraint firstAttribute="trailing" secondItem="mbx-zj-3nS" secondAttribute="trailing" id="9qe-jI-6zJ"/>
                                     <constraint firstAttribute="bottom" secondItem="mbx-zj-3nS" secondAttribute="bottom" id="IdT-aW-6dl"/>
@@ -162,13 +162,13 @@
             <objects>
                 <viewController id="Wsl-SD-zul" customClass="PDFPageNumberViewController" customModule="PDFReader" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="rXq-Jq-ZXD">
-                        <rect key="frame" x="0.0" y="0.0" width="140" height="25.5"/>
+                        <rect key="frame" x="0.0" y="0.0" width="140" height="27"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <visualEffectView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iRg-KD-0rq">
-                                <rect key="frame" x="0.0" y="0.0" width="140" height="25.5"/>
+                                <rect key="frame" x="0.0" y="0.0" width="140" height="27"/>
                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" id="f9H-aX-wtS">
-                                    <rect key="frame" x="0.0" y="0.0" width="140" height="25.5"/>
+                                    <rect key="frame" x="0.0" y="0.0" width="140" height="27"/>
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="12 von 1337" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="um4-sn-Qad">
