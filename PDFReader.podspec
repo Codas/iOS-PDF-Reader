@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
   s.name                  = "PDFReader"
-  s.version               = "2.4.1"
+  s.version               = "2.4.1.1"
   s.license               = { :type => "MIT" }
   s.homepage              = "https://github.com/Alua-Kinzhebayeva/iOS-PDF-Reader"
   s.author                = { "Alua Kinzhebayeva" => "alua.kinzhebayeva@gmail.com" }
@@ -12,4 +12,5 @@ Pod::Spec.new do |s|
   s.requires_arc          = true
   s.dependency 'RxSwift', '~> 3.6.0'
   s.dependency 'RxCocoa', '~> 3.5.0'
+  s.dependency 'Reusable', '~> 4.0.0'
 end

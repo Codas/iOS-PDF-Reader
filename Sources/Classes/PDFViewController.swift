@@ -13,39 +13,32 @@ extension PDFViewController {
     /// - parameter document:            PDF document to be displayed
     /// - parameter title:               title that displays on the navigation bar on the PDFViewController; 
     ///                                  if nil, uses document's filename
-    /// - parameter actionButtonImage:   image of the action button; if nil, uses the default action system item image
-    /// - parameter actionStyle:         sytle of the action button
-    /// - parameter backButton:          button to override the default controller back button
-    /// - parameter isThumbnailsEnabled: whether or not the thumbnails bar should be enabled
     /// - parameter startPageIndex:      page index to start on load, defaults to 0; if out of bounds, set to 0
+    /// - parameter sitemap:             Sitemap data, activates sitemap button if set
     ///
     /// - returns: a `PDFViewController`
-    public class func createNew(with document: PDFDocument, title: String? = nil, actionButtonImage: UIImage? = nil, actionStyle: ActionStyle = .print, backButton: UIBarButtonItem? = nil, isThumbnailsEnabled: Bool = true, startPageIndex: Int = 0) -> PDFViewController {
+    public class func createNew(with document: PDFDocument, title: String? = nil, startPageIndex: Int = 0, sitemap: PDFSitemap? = nil) -> PDFViewController {
         let storyboard = UIStoryboard(name: "PDFReader", bundle: Bundle(for: PDFViewController.self))
         let controller = storyboard.instantiateInitialViewController() as! PDFViewController
         controller.document = document
-        controller.actionStyle = actionStyle
-        
+        controller.actionStyle = .print
+
         if let title = title {
             controller.title = title
         } else {
             controller.title = document.fileName
         }
-        
+
         if startPageIndex >= 0 && startPageIndex < document.pageCount {
             controller.currentPageIndex = startPageIndex
         } else {
             controller.currentPageIndex = 0
         }
-        
-        controller.backButton = backButton
-        
-        if let actionButtonImage = actionButtonImage {
-            controller.actionButton = UIBarButtonItem(image: actionButtonImage, style: .plain, target: controller, action: #selector(actionButtonPressed))
-        } else {
-            controller.actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: controller, action: #selector(actionButtonPressed))
-        }
-        controller.isThumbnailsEnabled = isThumbnailsEnabled
+
+        controller.actionButton = UIBarButtonItem(barButtonSystemItem: .action, target: controller, action: #selector(actionButtonPressed))
+
+        controller.sitemap = sitemap
+
         return controller
     }
 }
@@ -87,9 +80,8 @@ public final class PDFViewController: UIViewController {
     }
     
     fileprivate var actionStyle = ActionStyle.print
-    
-    /// Image used to override the default action button image
-    fileprivate var actionButtonImage: UIImage?
+
+    fileprivate var sitemap: PDFSitemap?
     
     /// Current page being displayed
     fileprivate var currentPageIndex: Int = 0 {
@@ -146,12 +138,22 @@ public final class PDFViewController: UIViewController {
     
         collectionView.backgroundColor = backgroundColor
         collectionView.register(PDFPageCollectionViewCell.self, forCellWithReuseIdentifier: "page")
-        
-        navigationItem.rightBarButtonItem = actionButton
+
+        var rightButtons: [UIBarButtonItem] = []
+        if let actionButton = self.actionButton {
+            rightButtons.append(actionButton)
+        }
+        if sitemap != nil {
+            let sitemapButton = UIBarButtonItem(barButtonSystemItem: .bookmarks, target: self, action: #selector(sitemapButtonPressed))
+            rightButtons.append(sitemapButton)
+        }
+
+        navigationItem.rightBarButtonItems = rightButtons
         if let backItem = backButton {
             navigationItem.leftBarButtonItem = backItem
         }
 
+        setPageCounter()
         let numberOfPages = CGFloat(document.pageCount)
         let cellSpacing = CGFloat(2.0)
         let totalSpacing = (numberOfPages - 1.0) * cellSpacing
@@ -200,7 +202,7 @@ public final class PDFViewController: UIViewController {
         
         super.viewWillTransition(to: size, with: coordinator)
     }
-    
+
     /// Takes an appropriate action based on the current action style
     func actionButtonPressed() {
         switch actionStyle {
@@ -210,6 +212,22 @@ public final class PDFViewController: UIViewController {
             presentActivitySheet()
         case .customAction(let customAction):
             customAction()
+        }
+    }
+
+    /// Takes an appropriate action based on the current action style
+    func sitemapButtonPressed() {
+        if let sitemap = self.sitemap {
+            let storyboard = UIStoryboard(name: "PDFReader", bundle: Bundle(for: PDFViewController.self))
+            let controller = storyboard.instantiateViewController(withIdentifier: "PDFSitemapViewController") as! PDFSitemapViewController
+            controller.sitemap = sitemap
+            controller.currentPageIndex = self.currentPageIndex
+            controller.delegate = self
+            if let navigationController = navigationController {
+                navigationController.pushViewController(controller, animated: true)
+            } else {
+                present(controller, animated: true)
+            }
         }
     }
     
@@ -261,6 +279,15 @@ extension PDFViewController: UICollectionViewDataSource {
     }
 }
 
+extension PDFViewController: PDFSitemapViewControllerDelegate {
+    func didSelect(page: Int) {
+        let pageIndex = page - 1
+        let thumbnailIndexPath = IndexPath(row: pageIndex, section: 0)
+        collectionView.scrollToItem(at: thumbnailIndexPath, at: .left, animated: false)
+        thumbnailCollectionController?.currentPageIndex = pageIndex
+    }
+}
+
 extension PDFViewController: PDFPageCollectionViewCellDelegate {
     /// Toggles the hiding/showing of the thumbnail controller
     ///
@@ -288,6 +315,7 @@ extension PDFViewController: PDFPageCollectionViewCellDelegate {
         })
     }
 }
+
 
 extension PDFViewController: UICollectionViewDelegateFlowLayout {
     public func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {

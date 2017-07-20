@@ -26,6 +26,10 @@
 		146D371F1DAB7EDF004EEFA5 /* StartViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146D371E1DAB7EDF004EEFA5 /* StartViewController.swift */; };
 		146D37231DAB7F0F004EEFA5 /* apple.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 146D37211DAB7F0F004EEFA5 /* apple.pdf */; };
 		146D37241DAB7F0F004EEFA5 /* mongodb.pdf in Resources */ = {isa = PBXBuildFile; fileRef = 146D37221DAB7F0F004EEFA5 /* mongodb.pdf */; };
+		146D49F71F20DB68006507D0 /* PDFPageNumberViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146D49F31F20DB68006507D0 /* PDFPageNumberViewController.swift */; };
+		146D49F81F20DB68006507D0 /* PDFSitemap.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146D49F41F20DB68006507D0 /* PDFSitemap.swift */; };
+		146D49F91F20DB68006507D0 /* PDFSitemapTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146D49F51F20DB68006507D0 /* PDFSitemapTableViewCell.swift */; };
+		146D49FA1F20DB68006507D0 /* PDFSitemapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 146D49F61F20DB68006507D0 /* PDFSitemapViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -74,6 +78,10 @@
 		146D371E1DAB7EDF004EEFA5 /* StartViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = StartViewController.swift; sourceTree = "<group>"; };
 		146D37211DAB7F0F004EEFA5 /* apple.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = apple.pdf; sourceTree = "<group>"; };
 		146D37221DAB7F0F004EEFA5 /* mongodb.pdf */ = {isa = PBXFileReference; lastKnownFileType = image.pdf; path = mongodb.pdf; sourceTree = "<group>"; };
+		146D49F31F20DB68006507D0 /* PDFPageNumberViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFPageNumberViewController.swift; sourceTree = "<group>"; };
+		146D49F41F20DB68006507D0 /* PDFSitemap.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFSitemap.swift; sourceTree = "<group>"; };
+		146D49F51F20DB68006507D0 /* PDFSitemapTableViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFSitemapTableViewCell.swift; sourceTree = "<group>"; };
+		146D49F61F20DB68006507D0 /* PDFSitemapViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = PDFSitemapViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -145,7 +153,11 @@
 			children = (
 				14083FE81D4A956E00909913 /* PDFDocument.swift */,
 				14083FE91D4A956E00909913 /* PDFPageCollectionViewCell.swift */,
+				146D49F31F20DB68006507D0 /* PDFPageNumberViewController.swift */,
 				14083FEA1D4A956E00909913 /* PDFPageView.swift */,
+				146D49F41F20DB68006507D0 /* PDFSitemap.swift */,
+				146D49F51F20DB68006507D0 /* PDFSitemapTableViewCell.swift */,
+				146D49F61F20DB68006507D0 /* PDFSitemapViewController.swift */,
 				14083FEB1D4A956E00909913 /* PDFThumbnailCell.swift */,
 				14083FEC1D4A956E00909913 /* PDFThumbnailCollectionViewController.swift */,
 				14083FED1D4A956E00909913 /* PDFViewController.swift */,
@@ -300,12 +312,16 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				146D49F91F20DB68006507D0 /* PDFSitemapTableViewCell.swift in Sources */,
+				146D49FA1F20DB68006507D0 /* PDFSitemapViewController.swift in Sources */,
 				14083FF21D4A956E00909913 /* PDFPageView.swift in Sources */,
+				146D49F71F20DB68006507D0 /* PDFPageNumberViewController.swift in Sources */,
 				14083FF11D4A956E00909913 /* PDFPageCollectionViewCell.swift in Sources */,
 				14083FF01D4A956E00909913 /* PDFDocument.swift in Sources */,
 				14083FF51D4A956E00909913 /* PDFViewController.swift in Sources */,
 				14083FF41D4A956E00909913 /* PDFThumbnailCollectionViewController.swift in Sources */,
 				14083FF31D4A956E00909913 /* PDFThumbnailCell.swift in Sources */,
+				146D49F81F20DB68006507D0 /* PDFSitemap.swift in Sources */,
 				14083FF61D4A956E00909913 /* TiledView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
