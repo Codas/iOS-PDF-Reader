@@ -47,9 +47,7 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        DispatchQueue.global(qos: .background).async {
-            self.pageImages = self.document.allPageImages()
-        }
+        self.pageImages = self.document.allPageImages()
     }
 
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
