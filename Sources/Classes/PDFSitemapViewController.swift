@@ -45,7 +45,7 @@ class PDFSitemapViewController: UIViewController {
 
 extension PDFSitemapViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let sitemapContent: PDFSitemapContent = sitemap[indexPath.row]
+        let sitemapContent: IPDFSitemapContent = sitemap[indexPath.row]
         delegate?.didSelect(page: sitemapContent.page)
         self.navigationController?.popViewController(animated: true)
     }
@@ -58,7 +58,7 @@ extension PDFSitemapViewController: UITableViewDataSource {
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell: PDFSitemapTableViewCell = tableView.dequeueReusableCell(for: indexPath)
-        let sitemapContent: PDFSitemapContent = sitemap[indexPath.row]
+        let sitemapContent: IPDFSitemapContent = sitemap[indexPath.row]
         cell.titleLabel.text = sitemapContent.title
         cell.numberLabel.text = String(sitemapContent.page)
         return cell

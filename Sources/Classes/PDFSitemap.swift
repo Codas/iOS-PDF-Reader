@@ -8,9 +8,9 @@
 
 import Foundation
 
-public typealias PDFSitemap = [PDFSitemapContent]
+public typealias PDFSitemap = [IPDFSitemapContent]
 
-public struct PDFSitemapContent {
-    public let title: String
-    public let page: Int
+public protocol IPDFSitemapContent {
+    var title: String { get }
+    var page: Int { get }
 }
