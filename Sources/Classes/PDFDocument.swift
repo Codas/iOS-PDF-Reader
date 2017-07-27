@@ -92,7 +92,7 @@ public struct PDFDocument {
         
         self.coreDocument = coreDocument
         self.pageCount = coreDocument.numberOfPages
-//        self.loadPages()
+        self.loadPages()
     }
 
     mutating func invalidate() {
@@ -132,7 +132,7 @@ public struct PDFDocument {
     /// - parameter callback: callback to execute when finished
     ///
     /// - returns: Image representation of the document page
-    func pdfPageImage(at pageNumber: Int, callback: (UIImage?) -> Void) {
+    func pdfPageImage(at pageNumber: Int, callback: @escaping (UIImage?) -> Void) {
         if let image = images.object(forKey: NSNumber(value: pageNumber)) {
             callback(image)
         } else {
@@ -142,7 +142,7 @@ public struct PDFDocument {
                     return
                 }
 
-                images.setObject(image, forKey: NSNumber(value: pageNumber))
+                self.images.setObject(image, forKey: NSNumber(value: pageNumber))
                 callback(image)
             })
         }
@@ -154,7 +154,7 @@ public struct PDFDocument {
     /// - parameter callback: callback to execute when finished
     ///
     /// - returns: Image representation of the document page
-    private func imageFromPDFPage(at pageNumber: Int, callback: (UIImage?) -> Void) {
+    private func imageFromPDFPage(at pageNumber: Int, callback: @escaping (UIImage?) -> Void) {
         guard !invalidated, let page = coreDocument.page(at: pageNumber) else {
             callback(nil)
             return
@@ -165,20 +165,20 @@ public struct PDFDocument {
         let pdfScale = min(scalingConstant/originalPageRect.width, scalingConstant/originalPageRect.height)
         let scaledPageSize = CGSize(width: originalPageRect.width * pdfScale, height: originalPageRect.height * pdfScale)
         let scaledPageRect = CGRect(origin: originalPageRect.origin, size: scaledPageSize)
-        
+
         // Create a low resolution image representation of the PDF page to display before the TiledPDFView renders its content.
         UIGraphicsBeginImageContextWithOptions(scaledPageSize, true, 1)
         guard let context = UIGraphicsGetCurrentContext() else {
             callback(nil)
             return
         }
-        
+
         // First fill the background with white.
         context.setFillColor(red: 1, green: 1, blue: 1, alpha: 1)
         context.fill(scaledPageRect)
-        
+
         context.saveGState()
-        
+
         // Flip the context so that the PDF page is rendered right side up.
         let rotationAngle: CGFloat
         switch page.rotationAngle {
@@ -195,14 +195,14 @@ public struct PDFDocument {
             rotationAngle = 0
             context.translateBy(x: 0, y: scaledPageSize.height)
         }
-        
+
         context.scaleBy(x: 1, y: -1)
         context.rotate(by: rotationAngle.degreesToRadians)
-        
+
         // Scale the context so that the PDF page is rendered at the correct size for the zoom level.
         context.scaleBy(x: pdfScale, y: pdfScale)
         defer { UIGraphicsEndImageContext() }
-        guard !invalidated else {
+        guard !self.invalidated else {
             callback(nil)
             return
         }
@@ -213,7 +213,7 @@ public struct PDFDocument {
             callback(nil)
             return
         }
-        
+
         callback(backgroundImage)
     }
 }
@@ -231,3 +231,4 @@ extension CGPDFPage {
         }
     }
 }
+
