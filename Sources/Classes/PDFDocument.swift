@@ -33,6 +33,8 @@ public struct PDFDocument {
     
     /// Image cache with the page index and and image of the page
     let images = NSCache<NSNumber, UIImage>()
+
+    internal var invalidated = false
     
     /// Returns a newly initialized document which is located on the file system.
     ///
@@ -90,7 +92,11 @@ public struct PDFDocument {
         
         self.coreDocument = coreDocument
         self.pageCount = coreDocument.numberOfPages
-        self.loadPages()
+//        self.loadPages()
+    }
+
+    mutating func invalidate() {
+        invalidated = true
     }
     
     /// Extracts image representations of each page in a background thread and stores them in the cache
@@ -149,7 +155,7 @@ public struct PDFDocument {
     ///
     /// - returns: Image representation of the document page
     private func imageFromPDFPage(at pageNumber: Int, callback: (UIImage?) -> Void) {
-        guard let page = coreDocument.page(at: pageNumber) else {
+        guard !invalidated, let page = coreDocument.page(at: pageNumber) else {
             callback(nil)
             return
         }
@@ -195,10 +201,14 @@ public struct PDFDocument {
         
         // Scale the context so that the PDF page is rendered at the correct size for the zoom level.
         context.scaleBy(x: pdfScale, y: pdfScale)
+        defer { UIGraphicsEndImageContext() }
+        guard !invalidated else {
+            callback(nil)
+            return
+        }
         context.drawPDFPage(page)
         context.restoreGState()
-        
-        defer { UIGraphicsEndImageContext() }
+
         guard let backgroundImage = UIGraphicsGetImageFromCurrentImageContext() else {
             callback(nil)
             return

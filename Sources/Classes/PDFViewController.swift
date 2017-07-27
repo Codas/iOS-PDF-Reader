@@ -161,7 +161,13 @@ public final class PDFViewController: UIViewController {
         let width = min(thumbnailWidth, view.bounds.width)
         thumbnailCollectionControllerWidth.constant = width
     }
-    
+
+    override public func willMove(toParentViewController parent: UIViewController?) {
+        if parent == nil {
+            document.invalidate()
+        }
+        super.willMove(toParentViewController: parent)
+    }
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         didSelectIndexPath(IndexPath(row: currentPageIndex, section: 0))
