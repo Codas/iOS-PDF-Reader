@@ -112,18 +112,18 @@ public struct PDFDocument {
     }
     
     /// Image representations of all the document pages
-    func allPageImages() -> [Observable<UIImage?>] {
-        return (0..<pageCount).map({ pageNumber in
-            Observable.create({observer in
-                DispatchQueue.global(qos: .background).async {
-                    self.pdfPageImage(at: pageNumber + 1) { image in
-                        observer.on(.next(image))
-                        observer.on(.completed)
-                    }
+    func allPageImages() -> [Variable<UIImage?>] {
+        let imageVars = (0..<pageCount).map { _ in
+            Variable<UIImage?>(nil)
+        }
+        (0..<pageCount).forEach({ pageNumber in
+            DispatchQueue.global(qos: .background).async {
+                self.pdfPageImage(at: pageNumber + 1) { image in
+                    imageVars[pageNumber].value = image
                 }
-                return Disposables.create()
-            }).observeOn(MainScheduler.instance).shareReplay(1)
+            }
         })
+        return imageVars
     }
     
     /// Image representation of the document page, first looking at the cache, calculates otherwise

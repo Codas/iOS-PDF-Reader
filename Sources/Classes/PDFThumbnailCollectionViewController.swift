@@ -39,7 +39,7 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
     weak var delegate: PDFThumbnailControllerDelegate?
     
     /// Small thumbnail image representations of the pdf pages
-    private var pageImages: [Observable<UIImage?>]? {
+    private var pageImages: [Variable<UIImage?>]? {
         didSet {
             collectionView?.reloadData()
         }
@@ -58,7 +58,9 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "Cell", for: indexPath) as! PDFThumbnailCell
         
         cell.image = pageImages?[indexPath.row]
-        cell.alpha = currentPageIndex == indexPath.row ? 1 : 0.2
+        UIView.performWithoutAnimation {
+            cell.alpha = currentPageIndex == indexPath.row ? 1 : 0.2
+        }
         
         return cell
     }

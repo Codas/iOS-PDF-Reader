@@ -82,6 +82,8 @@ public final class PDFViewController: UIViewController {
     fileprivate var actionStyle = ActionStyle.print
 
     fileprivate var sitemap: PDFSitemap?
+
+    fileprivate var disableScrollUpdates = false
     
     /// Current page being displayed
     fileprivate var currentPageIndex: Int = 0 {
@@ -154,12 +156,7 @@ public final class PDFViewController: UIViewController {
         }
 
         setPageCounter()
-        let numberOfPages = CGFloat(document.pageCount)
-        let cellSpacing = CGFloat(2.0)
-        let totalSpacing = (numberOfPages - 1.0) * cellSpacing
-        let thumbnailWidth = (numberOfPages * PDFThumbnailCell.cellSize.width) + totalSpacing
-        let width = min(thumbnailWidth, view.bounds.width)
-        thumbnailCollectionControllerWidth.constant = width
+        updateThumbnailCollectionControllerWidth(size: view.bounds.size)
     }
 
     override public func willMove(toParentViewController parent: UIViewController?) {
@@ -168,6 +165,7 @@ public final class PDFViewController: UIViewController {
         }
         super.willMove(toParentViewController: parent)
     }
+
     public override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         didSelectIndexPath(IndexPath(row: currentPageIndex, section: 0))
@@ -198,15 +196,18 @@ public final class PDFViewController: UIViewController {
     }
     
     public override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        let currentIndexPath = IndexPath(row: self.currentPageIndex, section: 0)
+        self.disableScrollUpdates = true
         coordinator.animate(alongsideTransition: { context in
-            let currentIndexPath = IndexPath(row: self.currentPageIndex, section: 0)
+            self.updateThumbnailCollectionControllerWidth(size: size)
+            self.thumbnailCollectionController?.currentPageIndex = self.currentPageIndex
             self.collectionView.reloadItems(at: [currentIndexPath])
             self.collectionView.scrollToItem(at: currentIndexPath, at: .centeredHorizontally, animated: false)
-            }) { context in
-                self.thumbnailCollectionController?.currentPageIndex = self.currentPageIndex
+        }) { context in
+            self.disableScrollUpdates = false
         }
-        
-        super.viewWillTransition(to: size, with: coordinator)
+
     }
 
     /// Takes an appropriate action based on the current action style
@@ -263,6 +264,15 @@ public final class PDFViewController: UIViewController {
 
     private func setPageCounter() {
         pageNumberController?.pageCount = PageCount(currentPage: currentPageIndex + 1, pageCount: document.pageCount)
+    }
+
+    private func updateThumbnailCollectionControllerWidth(size: CGSize) {
+        let numberOfPages = CGFloat(document.pageCount)
+        let cellSpacing = CGFloat(2.0)
+        let totalSpacing = (numberOfPages - 1.0) * cellSpacing
+        let thumbnailWidth = (numberOfPages * PDFThumbnailCell.cellSize.width) + totalSpacing
+        let width = min(thumbnailWidth, size.width)
+        thumbnailCollectionControllerWidth.constant = width
     }
 }
 
@@ -331,6 +341,9 @@ extension PDFViewController: UICollectionViewDelegateFlowLayout {
 
 extension PDFViewController: UIScrollViewDelegate {
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if disableScrollUpdates {
+            return
+        }
         let updatedPageIndex: Int
         if self.scrollDirection == .vertical {
             updatedPageIndex = Int(round(max(scrollView.contentOffset.y, 0) / scrollView.bounds.height))

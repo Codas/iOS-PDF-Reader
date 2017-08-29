@@ -19,13 +19,16 @@ internal final class PDFThumbnailCell: UICollectionViewCell {
     
     @IBOutlet var imageView: UIImageView?
 
-    public var image: Observable<UIImage?>? {
+    public var image: Variable<UIImage?>? {
         didSet {
-            if let image = self.image {
-                self.imageView?.image = nil
-                image.subscribe(onNext: { [weak self] uiImage in
-                    self?.imageView?.image = uiImage
-                }).disposed(by: bag)
+            if let imageVar = self.image {
+                self.imageView?.image = imageVar.value
+                if imageVar.value == nil {
+                    imageVar.asDriver().drive(onNext: { [weak self] uiImage in
+                        self?.imageView?.image = uiImage
+                        self?.bag = DisposeBag()
+                    }).disposed(by: bag)
+                }
             } else {
                 imageView?.image = nil
             }
