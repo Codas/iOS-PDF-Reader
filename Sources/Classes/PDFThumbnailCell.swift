@@ -19,6 +19,12 @@ internal final class PDFThumbnailCell: UICollectionViewCell {
     
     @IBOutlet var imageView: UIImageView?
 
+    override var alpha: CGFloat {
+        didSet {
+            print("new alpha value: \(alpha) for view \(self.hash)")
+        }
+    }
+
     public var image: Variable<UIImage?>? {
         didSet {
             if let imageVar = self.image {

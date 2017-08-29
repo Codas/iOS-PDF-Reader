@@ -31,7 +31,9 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
             if !collectionView.indexPathsForVisibleItems.contains(curentPageIndexPath) {
                 collectionView.scrollToItem(at: curentPageIndexPath, at: .centeredHorizontally, animated: true)
             }
-            collectionView.reloadData()
+            UIView.performWithoutAnimation {
+                collectionView.reloadData()
+            }
         }
     }
     
@@ -61,7 +63,7 @@ internal final class PDFThumbnailCollectionViewController: UICollectionViewContr
         UIView.performWithoutAnimation {
             cell.alpha = currentPageIndex == indexPath.row ? 1 : 0.2
         }
-        
+
         return cell
     }
     
